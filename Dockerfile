@@ -10,5 +10,5 @@ WORKDIR /app
 # คัดลอกเฉพาะไฟล์ .jar ที่ build เสร็จแล้วจาก Stage 1
 COPY --from=build /app/target/*.jar app.jar
 # Port ที่ Spring Boot application ของคุณรันอยู่ (ปกติคือ 8080)
-EXPOSE 8080
+EXPOSE 8888
 ENTRYPOINT ["java","-jar","app.jar"]
