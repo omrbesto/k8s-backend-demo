@@ -13,6 +13,6 @@ public class SimpleController {
 
     @GetMapping("/ping")
     public String ping() {
-        return "pong";
+        return "ping";
     }
 }
