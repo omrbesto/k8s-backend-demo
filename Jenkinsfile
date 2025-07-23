@@ -16,11 +16,11 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'master', url: 'https://github.com/omrbesto/k8s-backend-demo.git'
-            }
-        }
+//         stage('Checkout Code') {
+//             steps {
+//                 git branch: 'master', url: 'https://github.com/omrbesto/k8s-backend-demo.git'
+//             }
+//         }
 
         stage('Build & Unit Test') {
             steps {
