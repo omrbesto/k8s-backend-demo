@@ -16,8 +16,4 @@ public class SimpleController {
         return "ping";
     }
 
-    @GetMapping("/test")
-    public String test(){
-        return "test";
-    }
 }
