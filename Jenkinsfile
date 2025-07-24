@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         // ตรวจสอบว่ามี Maven installation ชื่อ 'maven-3.8.5' ใน Global Tool Configuration ของ Jenkins
-        maven 'maven-3.8.5'
+        maven 'maven-3.9.6'
     }
 
     environment {
