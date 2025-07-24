@@ -5,108 +5,39 @@ pipeline {
         githubPush()
     }
 
-    tools {
-        // ตรวจสอบว่ามี Maven installation ชื่อ 'maven-3.8.5' ใน Global Tool Configuration ของ Jenkins
-        maven 'maven-3.8.5'
-    }
-
-    environment {
-        // ที่อยู่ของ Nexus Docker Registry
-        NEXUS_DOCKER_REGISTRY = '192.168.56.103:8082'
-        // ชื่อ Docker Image
-        DOCKER_IMAGE_NAME = "demo-spring-boot-app"
-        // ที่อยู่ของ GitOps Repo
-        GITOPS_REPO = 'https://github.com/omrbesto/k8s-gitops-demo.git'
-    }
-
-    stage('Debug Info') {
-        steps {
-            script {
-                echo "=== Debug Information ==="
-                echo "Branch: ${env.GIT_BRANCH}"
-                echo "Commit: ${env.GIT_COMMIT}"
-                echo "Build Number: ${env.BUILD_NUMBER}"
-                echo "Triggered By: ${currentBuild.getBuildCauses()}"
-                sh 'git branch -a'
-                sh 'git log --oneline -5'
-            }
-        }
-    }
-
     stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'master', url: 'https://github.com/omrbesto/k8s-backend-demo.git'
-            }
-        }
-
-        stage('Build & Unit Test') {
-            steps {
-                // รัน Maven build
-                sh "mvn clean package"
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                // ใช้ SonarQube Scanner ที่ตั้งค่าไว้ใน Jenkins
-                withSonarQubeEnv('My-SonarQube-Server') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Build & Scan Docker Image') {
+        stage('Test Webhook') {
             steps {
                 script {
-                    // สร้าง Tag สำหรับ Image โดยใช้ Build Number ของ Jenkins
-                    def imageTag = "${env.BUILD_NUMBER}"
-                    // Build Docker Image
-                    sh "docker build -t ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag} ."
-                    // Scan Image ด้วย Trivy
-                    // ถ้าเจอช่องโหว่ระดับ CRITICAL, pipeline จะล้มเหลว
-                    sh "trivy image --exit-code 1 --severity CRITICAL ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag}"
+                    echo "=== WEBHOOK TRIGGERED SUCCESSFULLY ==="
+                    echo "Build Number: ${env.BUILD_NUMBER}"
+                    echo "Git Branch: ${env.GIT_BRANCH}"
+                    echo "Git Commit: ${env.GIT_COMMIT}"
+                    echo "Workspace: ${env.WORKSPACE}"
+
+                    // ดู build causes
+                    def causes = currentBuild.getBuildCauses()
+                    echo "Build Causes: ${causes}"
+
+                    // ดูว่ามี source code หรือไม่
+                    sh 'pwd'
+                    sh 'ls -la'
+                    sh 'git log --oneline -3'
                 }
             }
         }
 
-        stage('Push Image to Nexus') {
+        stage('Simple Build Test') {
             steps {
-                script {
-                    def imageTag = "${env.BUILD_NUMBER}"
-                    // Login เข้า Nexus โดยใช้ Credential ที่ตั้งไว้
-                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', passwordVariable: 'NEXUS_PASS', usernameVariable: 'NEXUS_USER')]) {
-                        sh "docker login -u '${NEXUS_USER}' -p '${NEXUS_PASS}' ${NEXUS_DOCKER_REGISTRY}"
-                        // Push Image
-                        sh "docker push ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag}"
-                    }
-                }
+                echo "Testing simple build..."
+                sh 'echo "Pipeline is working!"'
             }
         }
+    }
 
-        stage('Update GitOps Repository') {
-            steps {
-                script {
-                    def imageTag = "${env.BUILD_NUMBER}"
-                    // ใช้ Credential ของ GitOps Repo
-                    withCredentials([usernamePassword(credentialsId: 'gitops-repo-token', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USER')]) {
-                        // Clone GitOps Repo ลงมาใน workspace ชั่วคราว
-                        sh "git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
-                        // เข้าไปใน directory
-                        dir('k8s-backend-demo') {
-                            // ใช้คำสั่ง sed เพื่อเปลี่ยน image tag ในไฟล์ deployment.yaml
-                            sh "sed -i 's|image: .*|image: ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag}|g' deployment.yaml"
-                            // ตั้งค่า git user
-                            sh "git config user.email 'jenkins@ci.com'"
-                            sh "git config user.name 'Jenkins CI'"
-                            // Commit และ Push การเปลี่ยนแปลงกลับขึ้นไป
-                            sh "git add deployment.yaml"
-                            sh "git commit -m 'Update image to version ${imageTag}'"
-                            sh "git push"
-                        }
-                    }
-                }
-            }
+    post {
+        always {
+            echo "Pipeline finished - Build #${env.BUILD_NUMBER}"
         }
     }
 }
