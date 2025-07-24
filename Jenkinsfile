@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     tools {
         // ตรวจสอบว่ามี Maven installation ชื่อ 'maven-3.8.5' ใน Global Tool Configuration ของ Jenkins
         maven 'maven-3.8.5'
@@ -79,7 +75,7 @@ pipeline {
                         // Clone GitOps Repo ลงมาใน workspace ชั่วคราว
                         sh "git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
                         // เข้าไปใน directory
-                        dir('k8s-backend-demo') {
+                        dir('k8s-gitops-demo') {
                             // ใช้คำสั่ง sed เพื่อเปลี่ยน image tag ในไฟล์ deployment.yaml
                             sh "sed -i 's|image: .*|image: ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag}|g' deployment.yaml"
                             // ตั้งค่า git user
