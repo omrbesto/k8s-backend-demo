@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     tools {
         // ตรวจสอบว่ามี Maven installation ชื่อ 'maven-3.8.5' ใน Global Tool Configuration ของ Jenkins
         maven 'maven-3.8.5'
@@ -13,6 +17,20 @@ pipeline {
         DOCKER_IMAGE_NAME = "demo-spring-boot-app"
         // ที่อยู่ของ GitOps Repo
         GITOPS_REPO = 'https://github.com/omrbesto/k8s-gitops-demo.git'
+    }
+
+    stage('Debug Info') {
+        steps {
+            script {
+                echo "=== Debug Information ==="
+                echo "Branch: ${env.GIT_BRANCH}"
+                echo "Commit: ${env.GIT_COMMIT}"
+                echo "Build Number: ${env.BUILD_NUMBER}"
+                echo "Triggered By: ${currentBuild.getBuildCauses()}"
+                sh 'git branch -a'
+                sh 'git log --oneline -5'
+            }
+        }
     }
 
     stages {
