@@ -73,7 +73,15 @@ pipeline {
                     // ใช้ Credential ของ GitOps Repo
                     withCredentials([usernamePassword(credentialsId: 'gitops-repo-token', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USER')]) {
                         // Clone GitOps Repo ลงมาใน workspace ชั่วคราว
-                        sh "git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
+                        if (fileExists('k8s-gitops-demo')) {
+                            dir('k8s-gitops-demo') {
+                                // ดึงการเปลี่ยนแปลงล่าสุด
+                                sh "git pull origin master" // หรือ branch ที่คุณใช้
+                            }
+                        } else {
+                            // Clone ถ้ายังไม่มี
+                            sh "git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
+                        }
                         // เข้าไปใน directory
                         dir('k8s-gitops-demo') {
                             // ใช้คำสั่ง sed เพื่อเปลี่ยน image tag ในไฟล์ deployment.yaml
