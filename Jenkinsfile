@@ -76,7 +76,7 @@ pipeline {
                         if (fileExists('k8s-gitops-demo')) {
                             dir('k8s-gitops-demo') {
                                 // pull latest change
-                                sh "git pull origin master" // หรือ branch ที่คุณใช้
+                                sh "git pull origin main" // หรือ branch ที่คุณใช้
                             }
                         } else {
                             // Clone ถ้ายังไม่มี
