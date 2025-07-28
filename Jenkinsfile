@@ -75,7 +75,7 @@ pipeline {
                         // Clone GitOps Repo ลงมาใน workspace ชั่วคราว
                         if (fileExists('k8s-gitops-demo')) {
                             dir('k8s-gitops-demo') {
-                                // ดึงการเปลี่ยนแปลงล่าสุด
+                                // pull latest change
                                 sh "git pull origin master" // หรือ branch ที่คุณใช้
                             }
                         } else {
