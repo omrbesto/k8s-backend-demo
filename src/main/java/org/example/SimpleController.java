@@ -33,9 +33,9 @@ public class SimpleController {
         return "test2";
     }
 
-    @GetMapping("/error")
-    public String error() {
-        logger.error("Error endpoint called - simulating error");
+    @GetMapping("/simulate-error") // เปลี่ยนชื่อ Path
+    public String simulateError() { // เปลี่ยนชื่อ method ให้ตรงกับ Path
+        logger.error("Simulating error for testing");
         throw new RuntimeException("Simulated error for testing");
     }
 
