@@ -47,7 +47,8 @@ pipeline {
                     sh "docker build -t ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag} ."
                     // Scan Image ด้วย Trivy
                     // ถ้าเจอช่องโหว่ระดับ CRITICAL, pipeline จะล้มเหลว
-                    sh "trivy image --exit-code 1 --severity CRITICAL ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag}"
+                    // *** เพิ่ม --timeout เข้าไปในคำสั่ง Trivy ***
+                    sh "trivy image --exit-code 1 --severity CRITICAL --timeout 15m ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag}"
                 }
             }
         }
