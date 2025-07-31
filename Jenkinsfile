@@ -26,7 +26,9 @@ pipeline {
             steps {
                 script {
                     echo "Starting SAST scan with OWASP Dependency-Check..."
-                    sh 'mvn org.owasp:dependency-check-maven:check -Dformat=HTML -DoutputDirectory=dependency-check-report'
+                    withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                        sh 'mvn org.owasp:dependency-check-maven:check -Dformat=HTML -DoutputDirectory=dependency-check-report -Dnvd.api.key=$NVD_API_KEY'
+                    }
                     // ตรวจสอบผลลัพธ์และอาจจะทำให้ build fail หากเจอช่องโหว่ระดับสูง
                     // ตัวอย่างเช่น ตรวจสอบไฟล์ XML report
                     // หากต้องการให้ Pipeline ไม่ล้มเหลวเมื่อมีช่องโหว่ร้ายแรง
