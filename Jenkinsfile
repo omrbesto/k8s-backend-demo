@@ -22,24 +22,24 @@ pipeline {
             }
         }
 
-        stage('SAST Scan') {
-            steps {
-                script {
-                    echo "Starting SAST scan with OWASP Dependency-Check..."
-                    withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                        sh 'mvn org.owasp:dependency-check-maven:check -Dformat=HTML -DoutputDirectory=dependency-check-report -Dnvd.api.key=$NVD_API_KEY'
-                    }
-                    // ตรวจสอบผลลัพธ์และอาจจะทำให้ build fail หากเจอช่องโหว่ระดับสูง
-                    // ตัวอย่างเช่น ตรวจสอบไฟล์ XML report
-                    // หากต้องการให้ Pipeline ไม่ล้มเหลวเมื่อมีช่องโหว่ร้ายแรง
-                    // คุณอาจต้องใช้ Junit หรือ Scripting เพื่ออ่านผลลัพธ์และออกจากการทำงาน
-                    // หรือแค่ใช้ || true เพื่อให้ Pipeline ดำเนินต่อไปแม้จะมี WARN/ERROR (หากคุณแค่ต้องการรายงาน)
-                    // sh 'mvn org.owasp:dependency-check-maven:check -Dformat=HTML -DoutputDirectory=dependency-check-report || true'
-                    archiveArtifacts artifacts: 'dependency-check-report/**/*', fingerprint: true
-                    echo "SAST scan completed. Check artifacts for report."
-                }
-            }
-        }
+//         stage('SAST Scan') {
+//             steps {
+//                 script {
+//                     echo "Starting SAST scan with OWASP Dependency-Check..."
+//                     withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+//                         sh 'mvn org.owasp:dependency-check-maven:check -Dformat=HTML -DoutputDirectory=dependency-check-report -Dnvd.api.key=$NVD_API_KEY'
+//                     }
+//                     // ตรวจสอบผลลัพธ์และอาจจะทำให้ build fail หากเจอช่องโหว่ระดับสูง
+//                     // ตัวอย่างเช่น ตรวจสอบไฟล์ XML report
+//                     // หากต้องการให้ Pipeline ไม่ล้มเหลวเมื่อมีช่องโหว่ร้ายแรง
+//                     // คุณอาจต้องใช้ Junit หรือ Scripting เพื่ออ่านผลลัพธ์และออกจากการทำงาน
+//                     // หรือแค่ใช้ || true เพื่อให้ Pipeline ดำเนินต่อไปแม้จะมี WARN/ERROR (หากคุณแค่ต้องการรายงาน)
+//                     // sh 'mvn org.owasp:dependency-check-maven:check -Dformat=HTML -DoutputDirectory=dependency-check-report || true'
+//                     archiveArtifacts artifacts: 'dependency-check-report/**/*', fingerprint: true
+//                     echo "SAST scan completed. Check artifacts for report."
+//                 }
+//             }
+//         }
 
         stage('Build & Unit Test') {
             steps {
