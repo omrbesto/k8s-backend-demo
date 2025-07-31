@@ -1,2 +1,23 @@
 server:
   port: 8888
+logging:
+  pattern:
+    console: '{"timestamp":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","thread":"%thread","logger":"%logger{36}","message":"%msg","pod":"${POD_NAME:unknown}","namespace":"${POD_NAMESPACE:unknown}","node":"${NODE_NAME:unknown}"}%n'
+  level:
+    root: INFO
+    org.example: DEBUG
+    org.springframework.web: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
