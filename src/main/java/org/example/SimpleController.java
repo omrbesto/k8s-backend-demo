@@ -27,6 +27,12 @@ public class SimpleController {
         return "test";
     }
 
+    @GetMapping("/test2")
+    public String test2(){
+        logger.warn("Test2 endpoint called with warning");
+        return "test2";
+    }
+
     @GetMapping("/error")
     public String error() {
         logger.error("Error endpoint called - simulating error");
