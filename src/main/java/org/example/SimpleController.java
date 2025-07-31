@@ -27,12 +27,6 @@ public class SimpleController {
         return "test";
     }
 
-    @GetMapping("/test2")
-    public String test2(){
-        logger.warn("Test2 endpoint called with warning");
-        return "test2";
-    }
-
     @GetMapping("/simulate-error") // เปลี่ยนชื่อ Path
     public String simulateError() { // เปลี่ยนชื่อ method ให้ตรงกับ Path
         logger.error("Simulating error for testing");
