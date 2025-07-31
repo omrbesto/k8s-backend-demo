@@ -12,10 +12,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info,metrics,prometheus,readiness,liveness
+      base-path: /actuator
   endpoint:
     health:
       show-details: always
+    readiness:
+      enabled: true
+    liveness:
+      enabled: true
   health:
     readiness-state:
       enabled: true
