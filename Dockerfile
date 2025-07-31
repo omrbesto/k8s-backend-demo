@@ -5,7 +5,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Stage 2: Create a slim final image
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine-3.20
 WORKDIR /app
 # คัดลอกเฉพาะไฟล์ .jar ที่ build เสร็จแล้วจาก Stage 1
 COPY --from=build /app/target/*.jar app.jar
