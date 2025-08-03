@@ -96,15 +96,21 @@ pipeline {
                     // ใช้ Credential ของ GitOps Repo
                     withCredentials([usernamePassword(credentialsId: 'gitops-repo-token', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USER')]) {
                         // Clone GitOps Repo ลงมาใน workspace ชั่วคราว
-                        if (fileExists('k8s-gitops-demo')) {
-                            dir('k8s-gitops-demo') {
-                                // pull latest change
-                                sh "git pull --rebase origin dynamic-gitops"
-                            }
-                        } else {
-                            // Clone ถ้ายังไม่มี
-                            sh "git clone -b dynamic-gitops https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
-                        }
+//                         if (fileExists('k8s-gitops-demo')) {
+//                             dir('k8s-gitops-demo') {
+//                                 // pull latest change
+//                                 sh "git pull --rebase origin dynamic-gitops"
+//                             }
+//                         } else {
+//                             // Clone ถ้ายังไม่มี
+//                             sh "git clone -b dynamic-gitops https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
+//                         }
+
+                        sh "rm -rf k8s-gitops-demo"
+
+                        // *** 2. git clone ใหม่เสมอ เพื่อให้ได้โค้ดที่สะอาดและถูกต้อง ***
+                        sh "git clone -b dynamic-gitops https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
+
                         // เข้าไปใน directory
                         dir('k8s-gitops-demo') {
                             // อัพเดท image tag ในไฟล์ values.yaml
