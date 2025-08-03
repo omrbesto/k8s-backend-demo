@@ -99,11 +99,11 @@ pipeline {
                         if (fileExists('k8s-gitops-demo')) {
                             dir('k8s-gitops-demo') {
                                 // pull latest change
-                                sh "git pull origin dynamic-gitops" // หรือ branch ที่คุณใช้
+                                sh "git pull --rebase origin dynamic-gitops"
                             }
                         } else {
                             // Clone ถ้ายังไม่มี
-                            sh "git clone https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
+                            sh "git clone -b dynamic-gitops https://${GIT_USER}:${GIT_TOKEN}@github.com/omrbesto/k8s-gitops-demo.git"
                         }
                         // เข้าไปใน directory
                         dir('k8s-gitops-demo') {
@@ -117,7 +117,7 @@ pipeline {
                             sh "git config user.name 'Jenkins CI'"
                             sh "git add ${valuesFile}"
                             sh "git commit -m 'Update ${APP_NAME} ${ENVIRONMENT} image to version ${imageTag}'"
-                            sh "git push"
+                            sh "git push origin dynamic-gitops"
                         }
                     }
                 }
