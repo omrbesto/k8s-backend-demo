@@ -11,7 +11,15 @@ public class SimpleController {
 
     @GetMapping("/hello")
     public String hello() {
-        logger.info("Hello endpoint called");
+        // ใช้ System.out.println ก่อน
+        System.out.println("=== HELLO ENDPOINT HIT ===");
+        System.err.println("=== HELLO ENDPOINT ERROR STREAM ===");
+
+        // ลอง logger ทุก level
+        logger.error("ERROR: Hello endpoint called");
+        logger.warn("WARN: Hello endpoint called");
+        logger.info("INFO: Hello endpoint called");
+        logger.debug("DEBUG: Hello endpoint called");
         return "Hello from Spring Boot on Kubernetes!";
     }
 
