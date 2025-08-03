@@ -13,6 +13,8 @@ pipeline {
         DOCKER_IMAGE_NAME = "demo-spring-boot-app"
         // ที่อยู่ของ GitOps Repo
         GITOPS_REPO = 'https://github.com/omrbesto/k8s-gitops-demo.git'
+        APP_NAME = 'demo'
+        ENVIRONMENT = 'dev'
     }
 
     stages {
@@ -90,13 +92,14 @@ pipeline {
             steps {
                 script {
                     def imageTag = "${env.BUILD_NUMBER}"
+                    def valuesFile = "apps/backend/${APP_NAME}/values.${ENVIRONMENT}.yaml"
                     // ใช้ Credential ของ GitOps Repo
                     withCredentials([usernamePassword(credentialsId: 'gitops-repo-token', passwordVariable: 'GIT_TOKEN', usernameVariable: 'GIT_USER')]) {
                         // Clone GitOps Repo ลงมาใน workspace ชั่วคราว
                         if (fileExists('k8s-gitops-demo')) {
                             dir('k8s-gitops-demo') {
                                 // pull latest change
-                                sh "git pull origin main" // หรือ branch ที่คุณใช้
+                                sh "git pull origin dynamic-gitops" // หรือ branch ที่คุณใช้
                             }
                         } else {
                             // Clone ถ้ายังไม่มี
@@ -104,14 +107,16 @@ pipeline {
                         }
                         // เข้าไปใน directory
                         dir('k8s-gitops-demo') {
-                            // ใช้คำสั่ง sed เพื่อเปลี่ยน image tag ในไฟล์ deployment.yaml
-                            sh "sed -i 's|image: .*|image: ${NEXUS_DOCKER_REGISTRY}/${DOCKER_IMAGE_NAME}:${imageTag}|g' deployment.yaml"
-                            // ตั้งค่า git user
+                            // อัพเดท image tag ในไฟล์ values.yaml
+                            sh """
+                                sed -i 's|tag: .*|tag: "${imageTag}"|g' ${valuesFile}
+                            """
+
+                            // ตั้งค่า git และ commit
                             sh "git config user.email 'jenkins@ci.com'"
                             sh "git config user.name 'Jenkins CI'"
-                            // Commit และ Push การเปลี่ยนแปลงกลับขึ้นไป
-                            sh "git add deployment.yaml"
-                            sh "git commit -m 'Update image to version ${imageTag}'"
+                            sh "git add ${valuesFile}"
+                            sh "git commit -m 'Update ${APP_NAME} ${ENVIRONMENT} image to version ${imageTag}'"
                             sh "git push"
                         }
                     }
